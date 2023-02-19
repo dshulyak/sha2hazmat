@@ -46,6 +46,6 @@ fn main() {
         "elapsed={:?} chunks={:?} per second={:?}",
         elapsed,
         n,
-        n as f64 / elapsed.as_secs() as f64,
+        n as f64 * 1000f64 / elapsed.as_millis() as f64,
     )
 }

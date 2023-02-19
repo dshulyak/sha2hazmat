@@ -22,7 +22,9 @@ fn main() {
     let mut two: GenericArray<u8, U64> = GenericArray::default();
     for i in 0..buf.len() / 32 {
         one[..32].copy_from_slice(&buf[i * 32..(i + 1) * 32]);
-        for _ in 0..400 {
+        // poet makes 400 hashes with small input and 1 with a larger
+        // this is just an approximation to make it work in a similar way
+        for _ in 0..410 {
             two[..32].copy_from_slice(H256_256_U8.as_slice());
             unsafe {
                 let (_, state, _) = two.align_to_mut::<u32>();

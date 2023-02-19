@@ -13,31 +13,30 @@ const H256_256_U8: [u8; 32] = [
 
 fn main() {
     let mut f = File::open("/dev/random").unwrap();
-    let mut buf = vec![0u8; 128 << 20];
+    let mut buf = vec![0u8; 64 << 20];
     f.read_exact(&mut buf).unwrap();
 
     let start = SystemTime::now();
     let mut one: GenericArray<u8, U64> = GenericArray::default();
     let mut two: GenericArray<u8, U64> = GenericArray::default();
-    for chunk in buf.chunks_exact_mut(64) {
-        one.copy_from_slice(chunk);
+    for i in 0..buf.len() / 32 {
+        one[..32].copy_from_slice(&buf[i * 32..(i + 1) * 32]);
         for _ in 0..400 {
             two[..32].copy_from_slice(H256_256_U8.as_slice());
-            let state = unsafe {
+            unsafe {
                 let (_, state, _) = two.align_to_mut::<u32>();
-                state
+                compress256((&mut state[..8]).try_into().unwrap(), slice::from_ref(&one));
+                for i in 0..8 {
+                    state[i] = state[i].to_be();
+                }
             };
-            compress256((&mut state[..8]).try_into().unwrap(), slice::from_ref(&one));
-            for i in 0..8 {
-                state[i] = state[i].to_be();
-            }
             (one, two) = (two, one);
         }
     }
     black_box(one);
     black_box(two);
     let elapsed = start.elapsed().unwrap();
-    let n = buf.len() / 64;
+    let n = buf.len() / 32;
     println!(
         "elapsed={:?} chunks={:?} per second={:?}",
         elapsed,

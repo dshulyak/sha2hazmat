@@ -11,3 +11,9 @@ sha2 = "0.10.6"
 [features]
 default = ["compress"]
 compress = ["sha2/compress"]
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = true
+debug = false

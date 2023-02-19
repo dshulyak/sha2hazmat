@@ -17,6 +17,7 @@ fn main() {
     f.read_exact(&mut buf).unwrap();
 
     let start = SystemTime::now();
+    let mut rst = vec![]; 
     let mut one: GenericArray<u8, U64> = GenericArray::default();
     let mut two: GenericArray<u8, U64> = GenericArray::default();
     for i in 0..buf.len() / 32 {
@@ -32,9 +33,11 @@ fn main() {
             };
             (one, two) = (two, one);
         }
+        let mut leaf = [0u8; 32];
+        leaf.copy_from_slice(&one[..32]);
+        rst.push(leaf);
     }
-    black_box(one);
-    black_box(two);
+    black_box(rst);
     let elapsed = start.elapsed().unwrap();
     let n = buf.len() / 32;
     println!(
